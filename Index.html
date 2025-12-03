@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Happy Birthday — Interactive Page</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #FFF7F0;
+    --pink: #F5C4D1;
+    --lav: #DCC8F7;
+    --blue: #C8E7FF;
+    --gold: #F7D774;
+    --accent: var(--pink);
+    --text: #2b2b2b;
+    --panel: #ffffff;
+    --screen-tone: linear-gradient(45deg, rgba(0,0,0,0.02) 25%, transparent 25%, transparent 50%, rgba(0,0,0,0.02) 50%, rgba(0,0,0,0.02) 75%, transparent 75%, transparent);
+  }
+
+  /* Basic reset */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(circle at 10% 10%, rgba(220,200,247,0.12), transparent 10%),
+                radial-gradient(circle at 90% 90%, rgba(200,231,255,0.08), transparent 12%),
+                var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+
+  /* container */
+  .card{
+    width:100%;
+    max-width:920px;
+    min-height:640px;
+    background:var(--panel);
+    border-radius:18px;
+    box-shadow: 0 20px 50px rgba(20,20,30,0.12);
+    overflow:hidden;
+    position:relative;
+  }
+
+  /* header doodles */
+  .doodles{
+    position:absolute;
+    top:12px;
+    left:12px;
+    pointer-events:none;
+    z-index:20;
+  }
+  .doodle{
+    font-size:20px;
+    opacity:0.9;
+    transform-origin:center;
+    display:inline-block;
+    margin-right:8px;
+  }
+
+  /* pages */
+  .pages{
+    width:100%;
+    height:100%;
+    position:relative;
+    overflow:hidden;
+  }
+  .page{
+    position:absolute;
+    inset:0;
+    padding:48px;
+    display:flex;
+    gap:20px;
+    align-items:center;
+    justify-content:center;
+    transition:transform .6s cubic-bezier(.2,.9,.3,1), opacity .4s;
+    transform:translateX(100%);
+    opacity:0;
+    flex-direction:column;
+  }
+  .page.show{transform:translateX(0); opacity:1}
+  .page.left{transform:translateX(-100%); opacity:0}
+
+  /* welcome */
+  .welcome h1{
+    font-family:"Caveat", "Poppins", cursive;
+    font-size:44px;
+    margin:0 0 8px 0;
+    color:var(--accent);
+  }
+  .welcome p{margin:0 0 22px 0; font-size:16px; color: #5a5a5a}
+  .enter-btn{
+    background:linear-gradient(180deg,var(--pink), #f0a9bd);
+    border:none;
+    padding:12px 20px;
+    border-radius:12px;
+    box-shadow: 0 12px 30px rgba(245,196,209,0.28);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    font-size:16px;
+  }
+  .enter-sub{
+    margin-top:10px;
+    color:#8a7a8a;
+    font-size:13px;
+  }
+
+  /* scrapbook page */
+  .scrap-wrap{
+    width:100%;
+    max-width:820px;
+    display:flex;
+    gap:18px;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .polaroid{
+    width:200px;
+    background:white;
+    border-radius:8px;
+    padding:10px 10px 16px 10px;
+    box-shadow: 0 12px 30px rgba(20,20,30,0.08);
+    transform-origin:center;
+    transition:transform .28s ease, box-shadow .28s;
+    position:relative;
+    cursor:pointer;
+  }
+  .polaroid img{
+    width:100%;
+    height:140px;
+    object-fit:cover;
+    border-radius:6px;
+    display:block;
+  }
+  .polaroid .caption{
+    margin-top:8px;
+    font-family:"Caveat";
+    font-size:16px;
+    color:var(--text);
+    text-align:center;
+  }
+  .polaroid:hover{transform:rotate(-6deg) translateY(-6px); box-shadow: 0 24px 50px rgba(20,20,30,0.12);}
+  .tape{
+    width:64px;
+    height:22px;
+    background:linear-gradient(90deg, rgba(255,255,255,0.25), rgba(255,255,255,0.09));
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%) rotate(-6deg);
+    top:-10px;
+    border-radius:3px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+  }
+
+  /* manhwa story panel */
+  .manhwa-panel{
+    width:86%;
+    max-width:760px;
+    border:8px solid rgba(20,20,30,0.04);
+    padding:26px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
+    position:relative;
+    box-shadow: 0 12px 40px rgba(20,20,30,0.05);
+  }
+  .manhwa-inner{
+    display:flex;
+    gap:20px;
+    align-items:center;
+  }
+  .manhwa-photo{
+    width:220px;
+    height:260px;
+    background:#eee;
+    border-radius:6px;
+    overflow:hidden;
+    flex-shrink:0;
+    border:6px solid #fff;
+    box-shadow: 0 8px 30px rgba(20,20,30,0.06);
+    position:relative;
+  }
+  .manhwa-photo img{width:100%; height:100%; object-fit:cover; display:block}
+  .manhwa-text{
+    flex:1;
+    padding:6px 12px;
+  }
+  .speech{
+    font-family:"Caveat";
+    font-size:20px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.98));
+    padding:12px 16px;
+    border-radius:12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+  }
+  .screen-tone{
+    position:absolute;
+    inset:0;
+    opacity:0.06;
+    pointer-events:none;
+    background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 6px, transparent 6px 12px);
+    mix-blend-mode: multiply;
+  }
+
+  /* game */
+  .game-area{
+    width:100%;
+    height:340px;
+    border-radius:12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(240,245,255,0.95));
+    box-shadow: 0 12px 40px rgba(20,20,30,0.04);
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
+  .game-top{
+    position:absolute;
+    top:12px;
+    left:12px;
+    font-weight:600;
+    color:#6b6b6b;
+  }
+  .hearts-area{width:100%; height:100%; position:relative}
+  .heart{
+    width:54px;
+    height:54px;
+    position:absolute;
+    transform-origin:center;
+    cursor:pointer;
+    user-select:none;
+    transition:transform .12s ease;
+    filter: drop-shadow(0 8px 14px rgba(245,196,209,0.12));
+  }
+  .heart svg{width:100%; height:100%}
+  .counter{
+    position:absolute;
+    bottom:10px;
+    right:12px;
+    font-weight:600;
+    color:#6b6b6b;
+    background:rgba(255,255,255,0.7);
+    padding:8px 12px;
+    border-radius:999px;
+    box-shadow: 0 8px 18px rgba(20,20,30,0.04);
+  }
+
+  /* vibe selection */
+  .vibes{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:center;
+    margin-top:10px;
+  }
+  .vibe-btn{
+    padding:10px 14px;
+    border-radius:12px;
+    border:2px solid rgba(0,0,0,0.06);
+    cursor:pointer;
+    background:white;
+    min-width:140px;
+    text-align:center;
+    font-weight:700;
+    box-shadow: 0 8px 20px rgba(20,20,30,0.03);
+  }
+
+  /* gift box */
+  .gift-wrap{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:18px;
+  }
+  .gift-box{
+    width:170px;
+    height:150px;
+    background: linear-gradient(180deg,#ffedfb, #ffdfee);
+    border-radius:12px;
+    position:relative;
+    box-shadow: 0 20px 50px rgba(20,20,30,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transform-origin:center;
+    transition: transform .34s cubic-bezier(.2,.9,.3,1);
+  }
+  .ribbon{
+    position:absolute;
+    width:100%;
+    height:18px;
+    left:0;
+    top:46%;
+    background: linear-gradient(90deg, #ffd3e6, #ffb3cf);
+    transform:translateY(-50%);
+    border-radius:6px;
+  }
+  .bow{
+    position:absolute;
+    width:56px;
+    height:46px;
+    top:10px;
+    left:50%;
+    transform:translateX(-50%);
+    background: radial-gradient(circle at 30% 30%, #fff 0 10%, #ffd3e6 11% 100%);
+    border-radius:8px;
+  }
+  .gift-open .bow{transform: translateX(-50%) translateY(-120%) rotate(-10deg); opacity:0}
+  .gift-open .ribbon{transform: translateY(-160%) scaleY(.9); opacity:0.12}
+  .gift-open .gift-box{transform: translateY(-40px) scale(.94);}
+
+  /* confetti */
+  .confetti-piece{
+    position:absolute;
+    width:10px;
+    height:14px;
+    opacity:0.95;
+    transform-origin:center;
+    pointer-events:none;
+  }
+
+  /* final manhwa panel */
+  .final-panel{
+    width:92%;
+    max-width:820px;
+    padding:28px;
+    border:10px solid rgba(20,20,30,0.04);
+    background: linear-gradient(180deg, #fff8fb, #ffffff);
+    border-radius:10px;
+    position:relative;
+    text-align:center;
+  }
+  .final-photo{
+    width:140px;
+    height:160px;
+    border-radius:8px;
+    overflow:hidden;
+    margin:0 auto 16px;
+    border:6px solid #fff;
+    box-shadow: 0 10px 30px rgba(20,20,30,0.06);
+  }
+  .final-text{
+    font-family:"Caveat";
+    font-size:22px;
+    color:var(--accent);
+    margin-bottom:12px;
+  }
+  .final-sub{
+    color:#6b6b6b;
+    font-size:15px;
+  }
+
+  /* small */
+  .controls{margin-top:18px; display:flex; gap:10px; align-items:center}
+  .small-btn{
+    padding:8px 12px; border-radius:10px; border:none; cursor:pointer; font-weight:600; background:#fff; box-shadow: 0 8px 20px rgba(20,20,30,0.03);
+  }
+
+  /* responsive */
+  @media (max-width:720px){
+    .card{min-height:720px; padding:14px}
+    .manhwa-inner{flex-direction:column}
+    .manhwa-photo{width:160px; height:190px}
+    .polaroid{width:46%}
+  }
+</style>
+</head>
+<body>
+<div class="card" role="application" aria-label="Interactive birthday page">
+  <div class="doodles" aria-hidden="true">
+    <span class="doodle">🌸</span>
+    <span class="doodle">✨</span>
+    <span class="doodle">💖</span>
+  </div>
+
+  <div class="pages">
+    <!-- PAGE 1: Welcome -->
+    <section id="page-welcome" class="page welcome show" data-page="welcome" aria-hidden="false">
+      <div style="text-align:center; max-width:720px">
+        <h1 id="title">Happy Birthday, <span id="her-name">Friend</span> ✨</h1>
+        <p>Open your story — a small scrapbook + manhwa surprise made just for you.</p>
+        <button class="enter-btn" id="enterBtn">Open Your Story →</button>
+        <div class="enter-sub">(Click to flip the first page)</div>
+      </div>
+    </section>
+
+    <!-- PAGE 2: Scrapbook Memories -->
+    <section id="page-scrap" class="page" data-page="scrap" aria-hidden="true">
+      <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+        <h2 style="font-family:'Caveat'; font-size:28px; color:var(--accent); margin:0 0 10px 0;">Our Scrapbook</h2>
+        <div class="scrap-wrap" id="scrapWrap">
+          <!-- Polaroids -->
+          <div class="polaroid" data-index="0" tabindex="0">
+            <div class="tape"></div>
+            <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="photo 1">
+            <div class="caption">That day we laughed so hard</div>
+          </div>
+
+          <div class="polaroid" data-index="1" tabindex="0">
+            <div class="tape" style="transform:translateX(-50%) rotate(6deg)"></div>
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="photo 2">
+            <div class="caption">Our little adventures</div>
+          </div>
+
+          <div class="polaroid" data-index="2" tabindex="0">
+            <div class="tape" style="transform:translateX(-50%) rotate(-2deg)"></div>
+            <img src="https://images.unsplash.com/photo-1506765515384-028b60a970df?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="photo 3">
+            <div class="caption">You, main character</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="small-btn" id="toManhwa">Turn the page →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 3: Manhwa Story Panel -->
+    <section id="page-manhwa" class="page" data-page="manhwa" aria-hidden="true">
+      <div class="manhwa-panel">
+        <div class="screen-tone" aria-hidden="true"></div>
+        <div class="manhwa-inner">
+          <div class="manhwa-photo" aria-hidden="true">
+            <img id="manhwaPhoto" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="hero">
+          </div>
+          <div class="manhwa-text">
+            <div class="speech">“This is your story — the panels you fill with laughter, silliness, and small magic.”</div>
+            <div style="height:12px"></div>
+            <div class="speech" style="font-size:16px">Turn the page for a tiny game — and don't forget to choose your vibe after!</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px">
+        <button class="small-btn" id="toGame">Play the mini-game →</button>
+      </div>
+    </section>
+
+    <!-- PAGE 4: Game -->
+    <section id="page-game" class="page" data-page="game" aria-hidden="true">
+      <div style="width:92%; max-width:800px">
+        <h2 style="font-family:'Caveat'; font-size:28px; color:var(--accent); text-align:center; margin:0 0 12px 0;">Pop the Hearts 💗</h2>
+        <div class="game-area" id="gameArea" aria-label="pop hearts game">
+          <div class="game-top">Pop 5 hearts to continue</div>
+          <div class="hearts-area" id="heartsArea"></div>
+          <div class="counter" id="counter">0 / 5</div>
+        </div>
+
+        <div class="controls" style="justify-content:center; margin-top:12px">
+          <button class="small-btn" id="toVibe" disabled>Choose your vibe →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 5: Vibe Selection -->
+    <section id="page-vibe" class="page" data-page="vibe" aria-hidden="true">
+      <div style="text-align:center; width:100%">
+        <h2 style="font-family:'Caveat'; font-size:28px; color:var(--accent); margin:0 0 8px 0">Choose your manhwa mood</h2>
+        <p style="margin:0 0 18px 0; color:#6b6b6b">Pick one — the rest of the page will match it.</p>
+
+        <div class="vibes" role="radiogroup" aria-label="vibe choices">
+          <div class="vibe-btn" data-vibe="cute" role="radio" aria-checked="false">🌸 Cute Girl Mode</div>
+          <div class="vibe-btn" data-vibe="soft" role="radio" aria-checked="false">🌙 Soft Emotional Mode</div>
+          <div class="vibe-btn" data-vibe="chaos" role="radio" aria-checked="false">😆 Chaotic BFF Mode</div>
+        </div>
+
+        <div class="controls" style="justify-content:center; margin-top:18px">
+          <button class="small-btn" id="toGift" disabled>Open the gift →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 6: Gift Box -->
+    <section id="page-gift" class="page" data-page="gift" aria-hidden="true">
+      <div class="gift-wrap">
+        <h2 style="font-family:'Caveat'; font-size:28px; color:var(--accent); margin:0 0 6px 0">A little present...</h2>
+        <div class="gift-box" id="giftBox" role="button" aria-pressed="false" tabindex="0">
+          <div class="ribbon"></div>
+          <div class="bow"></div>
+        </div>
+
+        <div style="color:#6b6b6b; margin-top:6px">Tap the gift to open</div>
+      </div>
+    </section>
+
+    <!-- PAGE 7: Final Manhwa Panel -->
+    <section id="page-final" class="page" data-page="final" aria-hidden="true">
+      <div class="final-panel">
+        <div class="final-photo">
+          <img id="finalPhoto" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="final hero">
+        </div>
+        <div class="final-text" id="finalTitle">Happy Birthday — main character ✨</div>
+        <div class="final-sub" id="finalMessage">Here’s to another beautiful chapter of your life. Keep shining — the world is your manhwa panel.</div>
+
+        <div style="margin-top:18px" class="controls">
+          <button class="small-btn" id="restart">Play again</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+/* -------------------------
+   Utilities & Page Navigation
+   ------------------------- */
+const pages = Array.from(document.querySelectorAll('.page'));
+function showPage(id){
+  pages.forEach(p=>{
+    p.classList.remove('show'); p.classList.remove('left');
+    if(p.id === id) {
+      p.classList.add('show');
+      p.setAttribute('aria-hidden','false');
+    } else {
+      // decide left or right for nicer animation
+      p.setAttribute('aria-hidden','true');
+    }
+  });
+
+  // Put previous pages to left for nicer feeling:
+  pages.forEach((p,i)=>{
+    const idxShow = pages.findIndex(x=>x.id===id);
+    const idx = i;
+    if(idx < idxShow) p.classList.add('left');
+    if(idx > idxShow) p.classList.remove('left');
+  });
+}
+
+/* Initial wiring */
+document.getElementById('enterBtn').addEventListener('click', ()=> showPage('page-scrap'));
+document.getElementById('toManhwa').addEventListener('click', ()=> showPage('page-manhwa'));
+document.getElementById('toGame').addEventListener('click', ()=> showPage('page-game'));
+document.getElementById('toVibe').addEventListener('click', ()=> showPage('page-vibe'));
+
+/* restart */
+document.getElementById('restart').addEventListener('click', ()=>{
+  // reset some state
+  resetGame();
+  setTimeout(()=> showPage('page-welcome'), 80);
+});
+
+/* optional keyboard: open gift with Enter when focused */
+document.getElementById('giftBox').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    openGift();
+  }
+});
+
+/* -------------------------
+   Scrapbook interaction
+   ------------------------- */
+const polaroids = document.querySelectorAll('.polaroid');
+polaroids.forEach(p=>{
+  p.addEventListener('click', ()=>{
+    const cap = p.querySelector('.caption').innerText;
+    showNoteBubble(cap);
+  });
+  p.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); p.click(); }
+  })
+});
+
+function showNoteBubble(text){
+  // simple popup
+  const popup = document.createElement('div');
+  popup.style.position='fixed';
+  popup.style.left='50%';
+  popup.style.top='50%';
+  popup.style.transform='translate(-50%,-50%)';
+  popup.style.background='white';
+  popup.style.padding='18px 20px';
+  popup.style.borderRadius='12px';
+  popup.style.boxShadow='0 20px 50px rgba(20,20,30,0.12)';
+  popup.style.fontFamily='"Caveat", "Poppins"';
+  popup.style.fontSize='18px';
+  popup.innerText = text;
+  popup.tabIndex = 0;
+  document.body.appendChild(popup);
+  popup.focus();
+  function close(){
+    popup.remove();
+  }
+  popup.addEventListener('click', close);
+  popup.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+}
+
+/* -------------------------
+   Manhwa level: small effects
+   ------------------------- */
+const manhwaPhoto = document.getElementById('manhwaPhoto');
+
+/* -------------------------
+   Mini-game: pop hearts (5)
+   ------------------------- */
+const heartsArea = document.getElementById('heartsArea');
+const counter = document.getElementById('counter');
+const toVibeBtn = document.getElementById('toVibe');
+let popped = 0;
+let hearts = [];
+function spawnHeart(i){
+  const el = document.createElement('div');
+  el.className = 'heart';
+  el.style.left = Math.random()*82 + '%';
+  el.style.top = (60 + Math.random()*28) + '%';
+  el.style.transform = `translateY(${Math.random()*6}px)`;
+  el.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="${i%2? 'url(#g1)':'url(#g2)'}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1" x1="0" x2="1">
+          <stop offset="0" stop-color="#ffd3e6"/><stop offset="1" stop-color="#ffb3cf"/>
+        </linearGradient>
+        <linearGradient id="g2" x1="0" x2="1">
+          <stop offset="0" stop-color="#ffd9f0"/><stop offset="1" stop-color="#ffbccf"/>
+        </linearGradient>
+      </defs>
+      <path d="M12 21s-7-4.7-9-8.2C-1 6.3 5.6 2 8.5 5.2 10 6.9 12 9 12 9s2-2.1 3.5-3.8C18.4 2 25 6.3 21 12.8 19 16.3 12 21 12 21z"/>
+    </svg>
+  `;
+  heartsArea.appendChild(el);
+
+  // float animation
+  el.animate([
+    { transform: `translateY(0) scale(1)` },
+    { transform: `translateY(-36px) scale(1.04)` },
+    { transform: `translateY(-12px) scale(1)` }
+  ], { duration: 1800 + Math.random()*1200, iterations: Infinity, easing: 'ease-in-out' });
+
+  el.addEventListener('click', ()=>{
+    if(el.classList.contains('popped')) return;
+    el.classList.add('popped');
+    popAnim(el);
+    popped++;
+    counter.innerText = popped + ' / 5';
+    if(popped >= 5){
+      toVibeBtn.disabled = false;
+      toVibeBtn.style.opacity = 1;
+      // small confetti burst
+      confettiBurst(18);
+    }
+  });
+
+  hearts.push(el);
+}
+
+function popAnim(el){
+  el.animate([
+    { transform: 'scale(1)' },
+    { transform: 'scale(.2) rotate(-8deg)', opacity:1 },
+    { transform: 'scale(.01)', opacity:0 }
+  ], { duration: 260, easing:'cubic-bezier(.2,.8,.2,1)'});
+  setTimeout(()=> el.remove(), 260);
+}
+
+function resetGame(){
+  popped = 0;
+  counter.innerText = '0 / 5';
+  toVibeBtn.disabled = true;
+  hearts.forEach(h => h.remove());
+  hearts = [];
+  // spawn fresh
+  for(let i=0;i<6;i++) spawnHeart(i);
+}
+resetGame();
+
+/* -------------------------
+   Vibe selection (changes theme variables & artwork)
+   ------------------------- */
+const vibeBtns = document.querySelectorAll('.vibe-btn');
+const toGiftBtn = document.getElementById('toGift');
+let chosenVibe = null;
+vibeBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    vibeBtns.forEach(b=>{ b.style.borderColor='rgba(0,0,0,0.06)'; b.setAttribute('aria-checked','false')});
+    btn.style.borderColor='rgba(0,0,0,0.12)';
+    btn.setAttribute('aria-checked','true');
+    chosenVibe = btn.dataset.vibe;
+    applyVibe(chosenVibe);
+    toGiftBtn.disabled = false;
+  });
+});
+
+function applyVibe(v){
+  if(v === 'cute'){
+    document.documentElement.style.setProperty('--accent', 'var(--pink)');
+    document.documentElement.style.setProperty('--bg', '#FFF7F0');
+    document.getElementById('manhwaPhoto').src = 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder';
+    // doodles or other tweaks could go here
+  } else if(v === 'soft'){
+    document.documentElement.style.setProperty('--accent', 'var(--blue)');
+    document.documentElement.style.setProperty('--bg', '#F5FAFF');
+    document.getElementById('manhwaPhoto').src = 'https://images.unsplash.com/photo-1506765515384-028b60a970df?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder';
+  } else if(v === 'chaos'){
+    document.documentElement.style.setProperty('--accent', 'var(--gold)');
+    document.documentElement.style.setProperty('--bg', '#fffef6');
+    document.getElementById('manhwaPhoto').src = 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder';
+  }
+}
+
+/* wire toGiftBtn */
+toGiftBtn.addEventListener('click', ()=> showPage('page-gift'));
+
+/* -------------------------
+   Gift box open + confetti
+   ------------------------- */
+const giftBox = document.getElementById('giftBox');
+giftBox.addEventListener('click', openGift);
+
+function openGift(){
+  giftBox.classList.add('gift-open');
+  giftBox.setAttribute('aria-pressed','true');
+  // confetti burst
+  confettiBurst(36);
+  setTimeout(()=> {
+    // animate transition to final manhwa panel
+    showPage('page-final');
+    // small flourish on final elements
+    const finalTitle = document.getElementById('finalTitle');
+    finalTitle.animate([{transform:'translateY(8px)', opacity:0},{transform:'translateY(0)', opacity:1}], {duration:560, easing:'cubic-bezier(.2,.9,.3,1)'});
+  }, 900);
+}
+
+/* -------------------------
+   Confetti generator
+   ------------------------- */
+function confettiBurst(n){
+  const wrap = document.querySelector('.card');
+  for(let i=0;i<n;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti-piece';
+    const size = 6 + Math.random()*12;
+    c.style.width = size + 'px';
+    c.style.height = (size*1.4) + 'px';
+    c.style.left = (40 + Math.random()*20) + '%';
+    c.style.top = '48%';
+    c.style.background = randomColor();
+    c.style.borderRadius = (Math.random()*30)+'%';
+    wrap.appendChild(c);
+
+    // animate falling + spin
+    const dx = (Math.random()-0.5)*220;
+    const dy = 380 + Math.random()*240;
+    const rot = (Math.random()>0.5?1:-1) * (120 + Math.random()*800);
+    c.animate([
+      { transform: `translate(0,0) rotate(0deg)`, opacity:1 },
+      { transform: `translate(${dx}px, ${dy}px) rotate(${rot}deg)`, opacity:0.9 }
+    ], { duration: 900 + Math.random()*700, easing:'cubic-bezier(.2,.7,.2,1)'});
+    setTimeout(()=> c.remove(), 1600 + Math.random()*900);
+  }
+}
+function randomColor(){
+  const pal = ['#ffd3e6','#ffb3cf','#dcd1ff','#fff2cc','#c8e7ff','#f7d774'];
+  return pal[Math.floor(Math.random()*pal.length)];
+}
+
+/* -------------------------
+   Misc: small polish
+   ------------------------- */
+document.getElementById('toManhwa').addEventListener('keydown', (e)=>{ if(e.key==='Enter') document.getElementById('toManhwa').click(); });
+document.getElementById('toGame').addEventListener('keydown', (e)=>{ if(e.key==='Enter') document.getElementById('toGame').click(); });
+
+/* keyboard quick restart for testing */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'r' && e.ctrlKey) {
+    resetGame();
+    showPage('page-welcome');
+  }
+});
+
+/* small accessibility: focus first interactive on page show */
+const observer = new MutationObserver(()=> {
+  const current = pages.find(p=>p.classList.contains('show'));
+  if(current) {
+    const focusable = current.querySelector('button, [tabindex]');
+    if(focusable) focusable.focus();
+  }
+});
+observer.observe(document.querySelector('.pages'), {attributes:true, subtree:true, childList:true});
+
+/* small finishing message texts (defaults) */
+document.getElementById('finalMessage').innerText = "Here's to another beautiful chapter of your life. Keep shining — you're the main character.";
+document.getElementById('finalTitle').innerText = "Happy Birthday — Main Character ✨";
+
+/* Set displayed name (default 'Friend') - safe demo */
+document.getElementById('her-name').innerText = "You";
+
+/* End of script */
+</script>
+</body>
+</html>
